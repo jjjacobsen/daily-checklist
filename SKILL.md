@@ -1,18 +1,37 @@
 ---
 name: daily-checklist
-description: Writes the checklist for tomorrow's daily note
+description: Prepares tomorrow's daily note in Obsidian. A deterministic Ruby script builds the checklist from the daily template, backlog open loops, and today's unfinished items, then AI adds email and calendar items, a principle, a bible verse, and a zig coding challenge. Runs daily at 9 PM
 ---
 
 # Daily Checklist
 
 ## Situation
 
-Obsidian has a core plugin called "Daily notes". This plugin provides keybindings and settings for utilizing daily notes. I have mine setup so that they all exist under the `~/Documents/obsidian/daily` directory and their filename is of the format `YYYY-MM-DD`. This skill will write tomorrows note using some deterministic processing from a script and maybe some AI generated items
+Obsidian has a core plugin called "Daily notes". This plugin provides keybindings and settings for utilizing daily notes. I have mine setup so that they all exist under the `~/Documents/obsidian/daily` directory and their filename is of the format `YYYY-MM-DD`. This skill will write tomorrows note using deterministic processing from a script and then some AI generated sections
 
 ## Instructions
 
-1. Run `scripts/baseline.sh`
+1. Run the deterministic script from this skill's directory. It creates tomorrow's note and prints its path
 
-2. Read my email and calendar
+   ```bash
+   ruby scripts/prepare.rb
+   ```
 
-3. Write bible verse of the day
+   The script copies `daily-template.md`, appends the first-level items from the `## Open Loops` section of `backlog.md`, carries over today's unchecked checklist items (an item already on the list is not added twice), and removes obsidian links from the unchecked items in today's note. Checked items keep their links. If the script fails because the note already exists, use that note and continue with the steps below
+
+2. Use `gws` to fetch my email and calendar information. Add anything important for tomorrow to the `## Checklist` section of the note as new `- [ ] ` items (appointments, deadlines, emails that need action). Do not add things already on the list
+
+   ```bash
+   gws gmail users messages list --params '{"userId": "me", "maxResults": 10}'
+   gws calendar events list --params '{"calendarId": "primary", "timeMin": "<tomorrow>T00:00:00Z", "timeMax": "<tomorrow+1>T00:00:00Z", "singleEvents": true, "orderBy": "startTime"}'
+   ```
+
+3. Append a `## Principle` section to the note. Choose a random top-level bullet from anywhere in `~/Documents/obsidian/principles.md` (any section, not just "My own thoughts"). Copy the bullet and its indented sub-bullets. Do not repeat a principle used in the past week of daily notes
+
+4. Append a `## Daily Verse` section. Fetch a random verse and write its text and reference (Book Chapter:Verse) as-is. The translation is KJV, do not modify the wording
+
+   ```bash
+   curl -s 'https://bible-api.com/data/kjv/random'
+   ```
+
+5. Append a `## Daily Challenge` section. Write one somewhat easy coding problem in the style of a LeetCode prompt: a title, a problem statement, constraints, and an example input and output. Gear it toward Zig and include Zig-specific requirements where natural (slices, allocators, optionals, error unions, comptime). Only the prompt is needed, no test framework and no solution. Do not repeat a problem from the past week of daily notes
