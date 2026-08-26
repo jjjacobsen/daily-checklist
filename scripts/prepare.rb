@@ -2,6 +2,7 @@
 # Prepares tomorrow's daily note in the Obsidian vault.
 #
 # - creates <tomorrow>.md from daily-template.md
+# - adds tasks due from recurring.md and advances their next due dates
 # - appends the first-level items from "## Open Loops" in backlog.md
 # - carries over today's unchecked checklist items (no duplicates)
 # - removes obsidian links from the unchecked items in today's note
@@ -14,6 +15,7 @@ vault = ARGV[0] || File.expand_path("~/Documents/obsidian")
 daily_dir = File.join(vault, "daily")
 template_path = File.join(daily_dir, "daily-template.md")
 backlog_path = File.join(vault, "backlog.md")
+recurring_path = File.join(vault, "recurring.md")
 
 today = Date.today
 tomorrow = today + 1
@@ -52,6 +54,50 @@ def open_loops(lines)
   items
 end
 
+# Returns the next date for intervals such as 1d, 2w, 3mo, or 1y
+def advance(date, interval)
+  amount, unit = interval.match(/\A([1-9]\d*)(d|w|mo|y)\z/)&.captures
+  raise "invalid recurring interval: #{interval}" unless amount
+
+  case unit
+  when "d" then date + amount.to_i
+  when "w" then date + (amount.to_i * 7)
+  when "mo" then date >> amount.to_i
+  when "y" then date >> (amount.to_i * 12)
+  end
+end
+
+# Returns tasks due on or before due_on and advances their dates in the table
+def recurring_tasks(lines, due_on)
+  header_index = lines.index { |line| line.split("|").map(&:strip).include?("Next Due") }
+  raise 'no recurring table with a "Next Due" column' unless header_index
+
+  header = lines[header_index].split("|", -1).map(&:strip)
+  task_index = header.index("Task")
+  due_index = header.index("Next Due")
+  interval_index = header.index("Interval")
+  raise 'recurring table must have "Task", "Next Due", and "Interval" columns' unless task_index && due_index && interval_index
+
+  tasks = []
+  updated = lines.dup
+  lines[(header_index + 2)..].each_with_index do |line, offset|
+    columns = line.split("|", -1)
+    next unless columns.length == header.length
+
+    task = columns[task_index].strip
+    next_due = Date.iso8601(columns[due_index].strip)
+    interval = columns[interval_index].strip
+    next if next_due > due_on
+
+    tasks << task
+    next_due = advance(next_due, interval) while next_due <= due_on
+    columns[due_index] = columns[due_index].sub(/\S+/, next_due.to_s)
+    updated[header_index + 2 + offset] = columns.join("|")
+  end
+
+  [tasks, updated]
+end
+
 # Removes obsidian links: [[target]] -> target, [[target|display]] -> display
 def delink(line)
   line.gsub(/\[\[([^\]|]+)(?:\|([^\]]+))?\]\]/) { Regexp.last_match(2) || Regexp.last_match(1) }
@@ -59,6 +105,7 @@ end
 
 template_lines = read_lines(template_path)
 backlog_items = open_loops(read_lines(backlog_path))
+recurring_items, recurring_lines = recurring_tasks(read_lines(recurring_path), tomorrow)
 today_lines = read_lines(today_path)
 
 # Carry over today's unchecked items, then remove their links in today's note
@@ -68,11 +115,11 @@ today_lines[from...to] = today_lines[from...to].map do |line|
   line.start_with?("- [ ] ") ? delink(line) : line
 end
 
-# Assemble tomorrow's checklist: template items, backlog items, carried items
+# Assemble tomorrow's checklist: recurring items, backlog items, carried items
 from, to = checklist_range(template_lines)
 items = []
 seen = []
-(template_lines[from...to].grep(/\A- \[/) +
+(recurring_items.map { |item| "- [ ] #{item}" } +
  backlog_items.map { |item| "- [ ] #{item.sub(/\A- (?:\[[ xX]\] )?/, "")}" } +
  unchecked).each do |line|
   text = line[/\A- \[[ xX]\] (.*)\z/, 1]
@@ -85,5 +132,6 @@ tomorrow_lines = template_lines[0...from] + items + template_lines[to..]
 
 File.write(tomorrow_path, tomorrow_lines.join("\n") + "\n")
 File.write(today_path, today_lines.join("\n") + "\n")
+File.write(recurring_path, recurring_lines.join("\n") + "\n")
 
 puts tomorrow_path
