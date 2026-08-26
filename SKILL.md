@@ -18,7 +18,7 @@ Obsidian has a core plugin called "Daily notes". This plugin provides keybinding
    ruby scripts/prepare.rb
    ```
 
-   The script copies `daily-template.md` and populates its existing `## Checklist` section. It adds tasks from `recurring.md` whose `Next Due` date is tomorrow or earlier, then advances each due date by its interval. Supported intervals are days (`1d`), weeks (`1w`), months (`1mo`), and years (`1y`), with any positive number. An interval of `-` adds the task once and removes its row from `recurring.md` when it is due. It also appends the first-level items from the `## Open Loops` section of `backlog.md`, carries over today's unchecked checklist items (an item already on the list is not added twice), and removes obsidian links from the unchecked items in today's note. Checked items keep their links. If the script fails because the note already exists, use that note and continue with the steps below
+   The script copies `daily-template.md`, populates its existing `## Checklist` section from due recurring tasks, backlog open loops, and today's unfinished items, and avoids duplicates. It also advances recurring due dates, removes due one-time tasks, and removes Obsidian links from carried items in today's note. If tomorrow's note already exists, use it and continue with the steps below
 
 2. Use `gws` to fetch my email and calendar information. Add anything important for tomorrow to the `## Checklist` section of the note as new `- [ ] ` items (appointments, deadlines, emails that need action). Do not add things already on the list
 
