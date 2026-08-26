@@ -2,7 +2,7 @@
 # Prepares tomorrow's daily note in the Obsidian vault.
 #
 # - creates <tomorrow>.md from daily-template.md
-# - adds tasks due from recurring.md and advances their next due dates
+# - adds tasks due from recurring.md, then advances or removes them
 # - appends the first-level items from "## Open Loops" in backlog.md
 # - carries over today's unchecked checklist items (no duplicates)
 # - removes obsidian links from the unchecked items in today's note
@@ -80,6 +80,7 @@ def recurring_tasks(lines, due_on)
 
   tasks = []
   updated = lines.dup
+  one_time_rows = []
   lines[(header_index + 2)..].each_with_index do |line, offset|
     columns = line.split("|", -1)
     next unless columns.length == header.length
@@ -90,11 +91,18 @@ def recurring_tasks(lines, due_on)
     next if next_due > due_on
 
     tasks << task
+    row_index = header_index + 2 + offset
+    if interval == "-"
+      one_time_rows << row_index
+      next
+    end
+
     next_due = advance(next_due, interval) while next_due <= due_on
     columns[due_index] = columns[due_index].sub(/\S+/, next_due.to_s)
-    updated[header_index + 2 + offset] = columns.join("|")
+    updated[row_index] = columns.join("|")
   end
 
+  one_time_rows.reverse_each { |index| updated.delete_at(index) }
   [tasks, updated]
 end
 
