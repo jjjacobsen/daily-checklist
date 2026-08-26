@@ -21,10 +21,15 @@ Obsidian has a core plugin called "Daily notes". This plugin provides keybinding
 
 2. Use `gws` to fetch my email and calendar information. Add anything important for tomorrow to the `## Checklist` section of the note as new `- [ ] ` items (appointments, deadlines, emails that need action). Do not add things already on the list
 
+   First, list my calendars. Fetch tomorrow's events from every calendar whose `selected` field is `true`, not only the primary calendar. The selected calendars should include Jonah Jacobsen, one of the two calendars named Birthdays, Christian and U.S. Holidays, Church, Fun, and Roadmap. Use the `selected` field to distinguish the two Birthdays calendars. Do not fetch events from the unselected Birthdays or Tasks calendars
+
    ```bash
    gws gmail users messages list --params '{"userId": "me", "maxResults": 10}'
-   gws calendar events list --params '{"calendarId": "primary", "timeMin": "<tomorrow>T00:00:00Z", "timeMax": "<tomorrow+1>T00:00:00Z", "singleEvents": true, "orderBy": "startTime"}'
+   gws calendar calendarList list --params '{}'
+   gws calendar events list --params '{"calendarId": "<selected-calendar-id>", "timeMin": "<tomorrow>T00:00:00Z", "timeMax": "<tomorrow+1>T00:00:00Z", "singleEvents": true, "orderBy": "startTime"}'
    ```
+
+   Run the events command once for each selected calendar ID
 
 3. Populate the existing `## Principle` section in the note. Choose a random top-level bullet from anywhere in `~/Documents/obsidian/principles.md` (any section, not just "My own thoughts"). Copy the bullet and its indented sub-bullets. Do not repeat a principle used in the past week of daily notes
 
