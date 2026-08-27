@@ -1,6 +1,6 @@
 ---
 name: daily-checklist
-description: Prepares tomorrow's daily note in Obsidian. A deterministic Ruby script builds the checklist from due recurring tasks, backlog open loops, and today's unfinished items, then AI adds email and calendar items, a principle, a bible verse, and a zig coding challenge. Runs daily at 9 PM
+description: Prepares tomorrow's daily note in Obsidian. A deterministic Ruby script builds the checklist from due recurring tasks, backlog open loops, and today's unfinished items, then AI adds email and calendar items, a principle, and a bible verse. Runs daily at 9 PM
 compatibility: Requires Ruby, gws, and the system timezone set properly
 ---
 
@@ -40,4 +40,3 @@ Obsidian has a core plugin called "Daily notes". This plugin provides keybinding
    curl -s 'https://bible-api.com/data/kjv/random'
    ```
 
-5. Populate the existing `## Daily Challenge` section. Write one somewhat easy coding problem in the style of a LeetCode prompt: a title, a problem statement, constraints, and an example input and output. Gear it toward Zig and include Zig-specific requirements where natural (slices, allocators, optionals, error unions, comptime). Only the prompt is needed, no test framework and no solution. Do not repeat a problem from the past week of daily notes
