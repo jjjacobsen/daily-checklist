@@ -18,7 +18,7 @@ Obsidian has a core plugin called "Daily notes". This plugin provides keybinding
    ruby scripts/prepare.rb
    ```
 
-   The script copies `daily-template.md`, populates its existing `## Checklist` section from due recurring tasks, backlog open loops, and today's unfinished items, and avoids duplicates. It also advances recurring due dates, removes due one-time tasks, and removes Obsidian links from carried items in today's note. If tomorrow's note already exists, use it and continue with the steps below
+   The script copies `daily-template.md`, populates its existing `## Checklist` section from due recurring tasks, backlog open loops, and today's unfinished items, and avoids duplicates. Recurring intervals can be elapsed periods such as `1d`, `2w`, `3mo`, and `1y`, or weekday schedules such as `Mon,Wed,Fri`. It also advances recurring due dates, removes due one-time tasks, and removes Obsidian links from carried items in today's note. If tomorrow's note already exists, use it and continue with the steps below
 
 2. Use `gws` to fetch my email and calendar information. Add anything important for tomorrow to the `## Checklist` section of the note as new `- [ ] ` items (appointments, deadlines, emails that need action). Do not add things already on the list
 
@@ -39,4 +39,3 @@ Obsidian has a core plugin called "Daily notes". This plugin provides keybinding
    ```bash
    curl -s 'https://bible-api.com/data/kjv/random'
    ```
-

@@ -54,8 +54,16 @@ def open_loops(lines)
   items
 end
 
-# Returns the next date for intervals such as 1d, 2w, 3mo, or 1y
+# Returns the next date for intervals such as 1d, 2w, 3mo, 1y, or Mon,Wed,Fri
 def advance(date, interval)
+  weekdays = %w[Sun Mon Tue Wed Thu Fri Sat]
+  if interval.match?(/\A(?:Sun|Mon|Tue|Wed|Thu|Fri|Sat)(?:,(?:Sun|Mon|Tue|Wed|Thu|Fri|Sat))*\z/)
+    scheduled_days = interval.split(",")
+    date += 1
+    date += 1 until scheduled_days.include?(weekdays[date.wday])
+    return date
+  end
+
   amount, unit = interval.match(/\A([1-9]\d*)(d|w|mo|y)\z/)&.captures
   raise "invalid recurring interval: #{interval}" unless amount
 
