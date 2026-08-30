@@ -39,3 +39,5 @@ Obsidian has a core plugin called "Daily notes". This plugin provides keybinding
    ```bash
    curl -s 'https://bible-api.com/data/kjv/random'
    ```
+
+5. After all sections are populated, ensure there are exactly two blank lines before each subsequent H2 heading. Do not leave a checklist item, principle, or verse directly adjacent to the next `##` heading

@@ -119,6 +119,21 @@ def delink(line)
   line.gsub(/\[\[([^\]|]+)(?:\|([^\]]+))?\]\]/) { Regexp.last_match(2) || Regexp.last_match(1) }
 end
 
+# Keeps exactly two blank lines between H2 sections
+def normalize_h2_spacing(lines)
+  seen_h2 = false
+  lines.each_with_object([]) do |line, result|
+    if line.start_with?("## ")
+      if seen_h2
+        result.pop while result.last == ""
+        result.concat(["", ""])
+      end
+      seen_h2 = true
+    end
+    result << line
+  end
+end
+
 template_lines = read_lines(template_path)
 backlog_items = open_loops(read_lines(backlog_path))
 recurring_items, recurring_lines = recurring_tasks(read_lines(recurring_path), tomorrow)
@@ -145,6 +160,7 @@ seen = []
 end
 
 tomorrow_lines = template_lines[0...from] + items + template_lines[to..]
+tomorrow_lines = normalize_h2_spacing(tomorrow_lines)
 
 File.write(tomorrow_path, tomorrow_lines.join("\n") + "\n")
 File.write(today_path, today_lines.join("\n") + "\n")
