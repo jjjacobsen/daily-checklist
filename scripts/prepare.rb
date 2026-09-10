@@ -8,6 +8,7 @@
 # - removes obsidian links from the unchecked items in today's note
 #
 # Usage: ruby prepare.rb [vault-dir]   (defaults to ~/Documents/obsidian)
+#        DAILY_CHECKLIST_TODAY=YYYY-MM-DD ruby prepare.rb [vault-dir]
 
 require "date"
 
@@ -17,7 +18,7 @@ template_path = File.join(daily_dir, "daily-template.md")
 backlog_path = File.join(vault, "backlog.md")
 recurring_path = File.join(vault, "recurring.md")
 
-today = Date.today
+today = Date.iso8601(ENV.fetch("DAILY_CHECKLIST_TODAY", Date.today.to_s))
 tomorrow = today + 1
 today_path = File.join(daily_dir, "#{today}.md")
 tomorrow_path = File.join(daily_dir, "#{tomorrow}.md")
