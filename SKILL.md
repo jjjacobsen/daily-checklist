@@ -1,6 +1,6 @@
 ---
 name: daily-checklist
-description: Prepares tomorrow's daily note in Obsidian. A deterministic Ruby script builds the checklist from due recurring tasks, backlog open loops, and today's unfinished items, then AI adds email and calendar items, a principle, and a bible verse. Runs daily at 9 PM
+description: Prepares tomorrow's daily note in Obsidian. A deterministic Ruby script builds the checklist from due recurring tasks, backlog open loops, and today's unfinished items, then AI adds email and calendar items, a principle, and a bible verse. Can run at any time. Configure automated run times in the scheduler
 compatibility: Requires Ruby, gws, and the system timezone set properly
 ---
 
