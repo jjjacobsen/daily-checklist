@@ -26,12 +26,12 @@ Obsidian has a core plugin called "Daily notes". This plugin provides keybinding
 
    The script copies `daily-template.md`, populates its existing `## Checklist` section from due recurring tasks, backlog open loops, and today's unfinished items, and avoids duplicates. Recurring intervals can be elapsed periods such as `1d`, `2w`, `3mo`, and `1y`, or weekday schedules such as `Mon,Wed,Fri`. It also advances recurring due dates, removes due one-time tasks, and removes Obsidian links from carried items in today's note. If tomorrow's note already exists, use it and continue with the steps below
 
-2. Use `gws` to fetch my email and calendar information. Add anything important for tomorrow to the `## Checklist` section of the note as new `- [ ] ` items (appointments, deadlines, emails that need action). Do not add things already on the list
+2. Use `gws` to fetch my email and calendar information. Only check email in my inbox, not archived messages. Add anything important for tomorrow to the `## Checklist` section of the note as new `- [ ] ` items (appointments, deadlines, emails that need action). Do not add things already on the list
 
    First, list my calendars. Fetch tomorrow's events from every calendar whose `selected` field is `true`, not only the primary calendar. The selected calendars should include Jonah Jacobsen, one of the two calendars named Birthdays, Christian and U.S. Holidays, Church, Fun, and Roadmap. Use the `selected` field to distinguish the two Birthdays calendars. Do not fetch events from the unselected Birthdays or Tasks calendars
 
    ```bash
-   gws gmail users messages list --params '{"userId": "me", "maxResults": 10}'
+   gws gmail users messages list --params '{"userId": "me", "labelIds": ["INBOX"], "maxResults": 10}'
    gws calendar calendarList list --params '{}'
    gws calendar events list --params '{"calendarId": "<selected-calendar-id>", "timeMin": "<tomorrow>T00:00:00Z", "timeMax": "<tomorrow+1>T00:00:00Z", "singleEvents": true, "orderBy": "startTime"}'
    ```
